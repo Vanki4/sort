@@ -123,6 +123,52 @@ void quickSort(int *mass,int left,int right) {
 	}
 }
 
+void radix(int *mass,int len,int k,int min) {
+	int *outp = new int[len];
+	int count[10] = {0};
+	for (int i = 0;i<len;i++)
+		count[(mass[i]/k)%10]++;
+	for (int i = 1;i<10;i++)
+		count[i]+=count[i-1];
+	for (int i = len-1;i>=0;i--)
+	{
+		int dig = (mass[i]/k)%10;
+		outp[count[dig]-1] = mass[i];
+	       	count[dig]--;
+	}
+	for (int i = 0;i<len;i++)
+	{
+		mass[i] = outp[i];
+	}
+	delete [] outp;
+}	
+
+void radixSort(int *mass,int len) {
+	int min = mass[0];
+	for (int i = 1;i<len;i++)
+	{
+		if (min > mass[i])
+			min = mass[i];
+	}
+	if (min<0)
+		min *= -1;
+	int max = mass[0];
+	for (int i = 0;i<len;i++)
+	{
+		mass[i]+=min;
+		if (max<mass[i])
+			max= mass[i];
+	}
+	for (int k = 1;max>0;k*=10)
+	{
+		radix(mass,len,k,min);
+		max /= 10;
+	}
+	for (int i = 0;i<len;i++)
+	{
+		mass[i]-=min;
+	}
+}
 
 int main(int argc,char **argv) {
 	srand(time(NULL));
@@ -138,7 +184,7 @@ int main(int argc,char **argv) {
 		mass[i] = rand()%(atoi(argv[3])-atoi(argv[2]))+atoi(argv[2]);
 	}
 	print(mass,len);
-	quickSort(mass,0,len-1);
+	radixSort(mass,len);
 	print(mass,len);
 	delete [] mass;
 	return 0;
